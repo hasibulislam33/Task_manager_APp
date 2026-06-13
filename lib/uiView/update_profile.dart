@@ -1,10 +1,15 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:todo_project/apiclasses/networkclass.dart';
 import 'package:todo_project/uiView/controllers/auth_controller.dart';
 import 'package:todo_project/uiView/controllers/user_model.dart';
 import 'package:todo_project/uiView/widget/TmAppBar.dart';
 import 'package:todo_project/uiView/widget/backgroundimage.dart';
+import 'package:todo_project/uiView/widget/photopicker.dart';
 import 'package:todo_project/uiView/widget/show_snackbar_massage.dart';
 import 'package:todo_project/utilities.dart';
 
@@ -20,6 +25,7 @@ class UpdateProfile extends StatefulWidget {
 
 class _UpdateProfileState extends State<UpdateProfile> {
 
+
   final _emailController = TextEditingController();
   final _firsNamecontroller = TextEditingController();
   final _lastNameController = TextEditingController();
@@ -29,6 +35,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
   GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
   bool InprogressUpdate = false;
+  XFile? _pickedImage;
 
   Future<void> _UpdateScreen()async{
     InprogressUpdate = true;
@@ -39,8 +46,14 @@ class _UpdateProfileState extends State<UpdateProfile> {
       "firstName":_firsNamecontroller.text.trim(),
       "lastName":_lastNameController.text.trim(),
       "mobile":_mibileNumberController.text.trim(),
-      "password":_passwordController.text.trim()
     };
+    if(_passwordController.text.isNotEmpty){
+      requestbody["password"] = _passwordController.text;
+    }
+    if(_pickedImage != null){
+      Uint8List imageByte = await _pickedImage!.readAsBytes();
+      requestbody["photo"] = base64Encode(imageByte);
+    }
 
     NetworkResponse response = await Networkcoller().postrequest(Urls.profileUpdate, requestbody);
 
@@ -48,17 +61,18 @@ class _UpdateProfileState extends State<UpdateProfile> {
     setState(() {});
 
 
-    if(response.isSuccess){
+    if(response.isSuccess) {
       AuthController.user = UserModel(
-        id: AuthController.user?.id?? "",
+        id: AuthController.user?.id ?? "",
         email: _emailController.text.trim(),
         firstName: _firsNamecontroller.text.trim(),
         lastName: _lastNameController.text.trim(),
         mobilenumber: _mibileNumberController.text.trim(),
+        photo: _pickedImage != null
+            ? base64Encode(await _pickedImage!.readAsBytes())
+            : AuthController.user!.photo,
       );
       snakbarMassage(context, "Profile Updated");
-      clearController();
-      setState(() {});
     }else{
       snakbarMassage(context, response.errormassage.toString());
     }
@@ -84,6 +98,16 @@ class _UpdateProfileState extends State<UpdateProfile> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    final UserModel usermodel = AuthController.user!;
+    _emailController.text  = usermodel.email;
+    _firsNamecontroller.text = usermodel.firstName;
+    _lastNameController.text = usermodel.lastName;
+    _mibileNumberController.text = usermodel.mobilenumber;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       
@@ -98,56 +122,18 @@ class _UpdateProfileState extends State<UpdateProfile> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 30,),
-
-                Text("Update your profile",
-                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    color: Colors.red
-
-                  ),),
-
-                SizedBox(height: 24,),
+                SizedBox(height: 40,),
 
                 GestureDetector(
-                  onTap: (){},
-                  child: Container(
-                    width: double.maxFinite,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10)
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 100,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: Colors.grey,
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(10),
-                              bottomLeft: Radius.circular(10),
-                            ),
-                          ),
-                          child: Center(
-                            child: Text("Photos",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold
-                            ),),
-                          ),
-                        ),
-                        SizedBox(width: 10,),
-                        Text("Select photo")
-                      ],
-                    ),
-                  ),
+                  onTap: pickupImage,
+                  child:
+                  photo_picker(PickedImage: _pickedImage,),
                 ),
 
                 SizedBox(height: 24,),
 
                 TextFormField(
+                  enabled: false,
                   controller: _emailController,
                   decoration: InputDecoration(
                     hintText: "Email",
@@ -231,9 +217,10 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       )
                   ),
                   validator: (String? value){
-                    if(value!.trim().isEmpty){
-                      return "Enter password";
-                    }
+                   String password = value ?? "";
+                   if(password.isNotEmpty && password.length <6){
+                     return "Password must be 6 digit";
+                   }
                   },
                 ),
 
@@ -259,4 +246,15 @@ class _UpdateProfileState extends State<UpdateProfile> {
       ),)
     );
   }
+  Future<void> pickupImage()async{
+    ImagePicker _imagePicker = ImagePicker();
+    XFile? image = await _imagePicker.pickImage(source: ImageSource.gallery);
+    if(image != null){
+      _pickedImage = image;
+      setState(() {});
+    }
+  }
 }
+
+
+

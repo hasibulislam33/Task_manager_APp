@@ -1,7 +1,12 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:todo_project/uiView/controllers/auth_controller.dart';
 import 'package:todo_project/uiView/sign_in_screen.dart';
 import 'package:todo_project/uiView/update_profile.dart';
+import 'dart:typed_data';
 
 class TmAppbar extends StatefulWidget implements PreferredSizeWidget {
   final bool enableProfileTap;
@@ -10,16 +15,27 @@ class TmAppbar extends StatefulWidget implements PreferredSizeWidget {
     required this.enableProfileTap,
   });
 
+
+
   @override
   State<TmAppbar> createState() => _TmAppbarState();
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
+
 }
 
 class _TmAppbarState extends State<TmAppbar> {
+
   @override
   Widget build(BuildContext context) {
+    Uint8List? imageBytes;
+
+    if (AuthController.user?.photo != null &&
+        AuthController.user!.photo!.isNotEmpty) {
+      imageBytes = base64Decode(AuthController.user!.photo!);
+    }
     final textTheme = Theme.of(context).textTheme;
 
     return AppBar(
@@ -36,8 +52,15 @@ class _TmAppbarState extends State<TmAppbar> {
             },
             child: CircleAvatar(
               radius: 20,
-              backgroundImage: AssetImage(""),
-            ),
+              backgroundImage:
+              imageBytes != null
+                  ? MemoryImage(imageBytes!)
+                  : null,
+              child:
+              imageBytes == null
+                  ? const Icon(Icons.person)
+                  : null,
+            )
           ),
           Text(
             "${AuthController.user?.fullname}\n${AuthController.user?.email}",
