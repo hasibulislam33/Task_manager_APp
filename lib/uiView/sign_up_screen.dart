@@ -32,9 +32,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     Map<String, dynamic> rewuestbody = {
       "email": _emaileditingconteroller.text.trim(),
-      "firstname": _firstnameeditingconteroller.text.trim(),
-      "lastname": _lastnameditingconteroller.text.trim(),
-      "mobilenumber": _mobilenumberditingconteroller.text.trim(),
+      "firstName": _firstnameeditingconteroller.text.trim(),
+      "lastName": _lastnameditingconteroller.text.trim(),
+      "mobile": _mobilenumberditingconteroller.text.trim(),
       "password": _passwordditingconteroller.text.trim()
     };
 

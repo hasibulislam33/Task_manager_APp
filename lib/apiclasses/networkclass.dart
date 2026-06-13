@@ -63,7 +63,7 @@ class Networkcoller {
       );
 
       final decoded = jsonDecode(response.body);
-      if (response.statusCode == 201) {
+      if (response.statusCode ==200) {
         return NetworkResponse(
           isSuccess: true,
           statuscode: response.statusCode,

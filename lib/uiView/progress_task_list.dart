@@ -20,7 +20,10 @@ class _ProgressTaskListState extends State<ProgressTaskList> {
   Future<void> _progressList()async{
     InProgress = true;
     setState(() {});
-    NetworkResponse response = await Networkcoller().getrequest(Urls.addnewtask);
+    NetworkResponse response = await Networkcoller().getrequest(Urls.progressTasklist);
+
+    InProgress = false;
+    setState(() {});
     List<NewtaskModel> list = [];
     if(response.isSuccess){
       for(Map<String, dynamic> jsondata in response.body["data"]){
@@ -29,10 +32,6 @@ class _ProgressTaskListState extends State<ProgressTaskList> {
       progress_list.clear();
       progress_list.addAll(list);
     }
-    setState(() {
-      InProgress = false;
-    });
-
   }
 
   @override
@@ -55,7 +54,9 @@ class _ProgressTaskListState extends State<ProgressTaskList> {
             itemCount: progress_list.length,
               shrinkWrap: true,
               itemBuilder: (context, index){
-                return TaskCard(model:progress_list[index]);
+                return TaskCard(model:progress_list[index], refresh: () {
+                  _progressList();
+                },);
               }),
         ),
       ),

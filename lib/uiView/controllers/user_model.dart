@@ -1,34 +1,39 @@
 class UserModel {
   final String id;
   final String email;
-  final String firstname;
-  final String lastname;
+  final String firstName;
+  final String lastName;
   final String mobilenumber;
+
+  String get fullname {
+    return "$firstName $lastName";
+  }
 
   UserModel({
     required this.id,
     required this.email,
-    required this.firstname,
-    required this.lastname,
+    required this.firstName,
+    required this.lastName,
     required this.mobilenumber,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic>jsondata){
+  factory UserModel.fromJson(Map<String, dynamic> jsondata) {
     return UserModel(
-        id: jsondata["id"],
-        email: jsondata["email"],
-        firstname: jsondata["firstname"],
-        lastname: jsondata["lastname"],
-        mobilenumber: jsondata["mobilenumber"]);
+      id: jsondata["_id"] ?? "",
+      email: jsondata["email"] ?? "",
+      firstName: jsondata["firstName"] ?? "",
+      lastName: jsondata["lastName"] ?? "",
+      mobilenumber: jsondata["mobile"] ?? "",
+    );
   }
 
-  Map<String, dynamic>tojson(){
+  Map<String, dynamic> tojson() {
     return {
-      "id": id,
+      "_id": id,
       "email": email,
-      "firstname": firstname,
-      "lastname": lastname,
-      "mobilenumber": mobilenumber
+      "firstName": firstName,
+      "lastName": lastName,
+      "mobile": mobilenumber,
     };
   }
 }

@@ -4,6 +4,7 @@ import 'package:todo_project/uiView/Splash_Screen.dart';
 import 'package:todo_project/uiView/add_new_task.dart';
 import 'package:todo_project/uiView/bottom_nab_page.dart';
 import 'package:todo_project/uiView/forget_by_email.dart';
+import 'package:todo_project/uiView/new_task_list.dart';
 import 'package:todo_project/uiView/pin_verification.dart';
 import 'package:todo_project/uiView/sign_in_screen.dart';
 import 'package:todo_project/uiView/sign_up_screen.dart';
@@ -79,6 +80,7 @@ class MyApp extends StatelessWidget {
       title: "To Do App",
 
       routes: {
+        "new_task_list": (_)=> NewTaskList(),
         "/splash" : (_)=> SplashScreen(),
         "sign-in": (_)=> SignInScreen(),
         "sign-up": (_)=> SignUpScreen(),

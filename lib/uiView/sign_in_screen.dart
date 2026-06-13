@@ -41,22 +41,16 @@ class _SignInScreenState extends State<SignInScreen> {
    };
 
    NetworkResponse response = await Networkcoller().postrequest(Urls.Login, requestbody);
-   print("isSuccess: ${response.isSuccess}");
-   print("statusCode: ${response.statuscode}");
-   print("body: ${response.body}");
-   print("error: ${response.errormassage}");
+   _signInprogress = false;
+   setState(() {});
 
    if(response.isSuccess){
      UserModel userModel = UserModel.fromJson(response.body["data"]);
      String accesskey = response.body["token"];
-     AuthController.savedData(accesskey, userModel);
-     _signInprogress = false;
-     setState(() {});
+     await AuthController.savedData(accesskey, userModel);
      Navigator.pushReplacementNamed(context, BottomNabPage.name);
    }else{
      snakbarMassage(context, response.errormassage.toString());
-     _signInprogress = false;
-     setState(() {});
    }
  }
  @override

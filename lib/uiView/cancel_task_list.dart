@@ -22,7 +22,10 @@ class _ProgressTaskListState extends State<CancelTaskList> {
     Inprogreess = true;
     setState(() {});
 
-    NetworkResponse response = await Networkcoller().getrequest(Urls.addnewtask);
+    NetworkResponse response = await Networkcoller().getrequest(Urls.CancelTaskList);
+
+    Inprogreess = false;
+    setState(() {});
 
     if(response.isSuccess){
       List<NewtaskModel> list = [];
@@ -34,8 +37,6 @@ class _ProgressTaskListState extends State<CancelTaskList> {
     }else{
       snakbarMassage(context, response.errormassage.toString());
     }
-    Inprogreess = false;
-    setState(() {});
   }
 
   @override
@@ -57,7 +58,10 @@ class _ProgressTaskListState extends State<CancelTaskList> {
               itemCount: cancel_list.length,
               shrinkWrap: true,
               itemBuilder: (context, index){
-                return TaskCard(model: cancel_list[index]);
+                return TaskCard(model: cancel_list[index], refresh: () {
+                  setState(() {});
+                  _getCancelList();
+                },);
               }),
         ),
       ),

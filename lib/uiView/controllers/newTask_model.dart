@@ -17,11 +17,11 @@ class NewtaskModel {
 
   factory NewtaskModel.fromJson(Map<String, dynamic>jsondata){
     return NewtaskModel(
-        id: jsondata["id"],
-        title: jsondata["email"],
+        id: jsondata["_id"],
+        title: jsondata["title"],
         description: jsondata["description"],
         email: jsondata["email"],
         status: jsondata["status"],
-        createDate: jsondata["createDate"]);
+        createDate: jsondata["createdDate"]);
   }
 }

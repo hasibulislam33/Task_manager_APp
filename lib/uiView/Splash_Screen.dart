@@ -18,7 +18,7 @@ class SplashScreen extends StatefulWidget {
 class _HomeState extends State<SplashScreen> {
   Future splash() async {
     await Future.delayed(Duration(seconds: 2));
-    if (AuthController.idUserLogin() == true) {
+    if (await AuthController.idUserLogin() == true) {
       await AuthController.getdata();
       Navigator.pushReplacementNamed(context, BottomNabPage.name);
     } else {
