@@ -30,12 +30,7 @@ class _TmAppbarState extends State<TmAppbar> {
 
   @override
   Widget build(BuildContext context) {
-    Uint8List? imageBytes;
 
-    if (AuthController.user?.photo != null &&
-        AuthController.user!.photo!.isNotEmpty) {
-      imageBytes = base64Decode(AuthController.user!.photo!);
-    }
     final textTheme = Theme.of(context).textTheme;
 
     return AppBar(
@@ -50,14 +45,15 @@ class _TmAppbarState extends State<TmAppbar> {
                 setState(() {});
               }
             },
-            child: CircleAvatar(
+            child:
+            CircleAvatar(
               radius: 20,
-              backgroundImage:
-              imageBytes != null
-                  ? MemoryImage(imageBytes!)
+              backgroundImage: AuthController.user!.photo.isNotEmpty
+                  ? MemoryImage(
+                base64Decode(AuthController.user!.photo),
+              )
                   : null,
-              child:
-              imageBytes == null
+              child: AuthController.user!.photo.isEmpty
                   ? const Icon(Icons.person)
                   : null,
             )

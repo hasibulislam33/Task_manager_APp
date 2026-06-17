@@ -28,6 +28,17 @@ class AuthController{
     }
   }
 
+  static Future<void> userUpdate(UserModel model)async{
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+
+    if(model.photo.trim().isEmpty){
+      model.photo =  user!.photo;
+    }
+    await preferences.setString(_user, jsonEncode(model.tojson()));
+    user = model;
+  }
+
+
   static Future<bool> idUserLogin()async{
     SharedPreferences preferences =await SharedPreferences.getInstance();
     String? token = preferences.getString(_tokenkey);

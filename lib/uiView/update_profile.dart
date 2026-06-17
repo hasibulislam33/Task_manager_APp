@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
@@ -32,37 +31,44 @@ class _UpdateProfileState extends State<UpdateProfile> {
   final _mibileNumberController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
   bool InprogressUpdate = false;
   XFile? _pickedImage;
 
-  Future<void> _UpdateScreen()async{
+  Future<void> _UpdateScreen()async {
     InprogressUpdate = true;
     setState(() {});
 
     Map<String, dynamic> requestbody = {
       "email": _emailController.text.trim(),
-      "firstName":_firsNamecontroller.text.trim(),
-      "lastName":_lastNameController.text.trim(),
-      "mobile":_mibileNumberController.text.trim(),
+      "firstName": _firsNamecontroller.text.trim(),
+      "lastName": _lastNameController.text.trim(),
+      "mobile": _mibileNumberController.text.trim(),
     };
-    if(_passwordController.text.isNotEmpty){
+    if (_passwordController.text.isNotEmpty) {
       requestbody["password"] = _passwordController.text;
     }
-    if(_pickedImage != null){
-      Uint8List imageByte = await _pickedImage!.readAsBytes();
-      requestbody["photo"] = base64Encode(imageByte);
+    if (_pickedImage != null) {
+      List<int>imageByte = await _pickedImage!.readAsBytes();
+      requestbody['photo']=base64Encode(imageByte);
     }
 
-    NetworkResponse response = await Networkcoller().postrequest(Urls.profileUpdate, requestbody);
 
-    InprogressUpdate = false;
-    setState(() {});
+    NetworkResponse response = await Networkcoller().postrequest(
+        Urls.profileUpdate, requestbody);
 
 
-    if(response.isSuccess) {
-      AuthController.user = UserModel(
+
+
+    if (response.isSuccess) {
+
+      await AuthController.userUpdate(UserModel.fromJson(requestbody));
+
+      if(!mounted)return;
+      snakbarMassage(context, "Profile Updated");
+
+      /*AuthController.user = UserModel(
         id: AuthController.user?.id ?? "",
         email: _emailController.text.trim(),
         firstName: _firsNamecontroller.text.trim(),
@@ -71,11 +77,21 @@ class _UpdateProfileState extends State<UpdateProfile> {
         photo: _pickedImage != null
             ? base64Encode(await _pickedImage!.readAsBytes())
             : AuthController.user!.photo,
-      );
+      );*/
+      /*await AuthController.savedData(
+          AuthController.accesskey!, AuthController.user!);
       snakbarMassage(context, "Profile Updated");
     }else{
       snakbarMassage(context, response.errormassage.toString());
+    }*/
     }
+    if(!response.isSuccess){
+      print(response.errormassage);
+      snakbarMassage(context, response.errormassage!);
+      //snakbarMassage(context, 'NotSuccess');
+    }
+    InprogressUpdate = false;
+    setState(() {});
   }
 
   void clearController(){
@@ -147,9 +163,9 @@ class _UpdateProfileState extends State<UpdateProfile> {
                     }else{
                       null;
                     }
-                    if(EmailValidator.validate(value!)== false){
+                    if(EmailValidator.validate(value)== false){
                       return "Enter valid email";
-                    };
+                    }
                     return null;
                   },
                 ),
@@ -186,6 +202,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                     if(value!.trim().isEmpty){
                       return "Enter your last name";
                     }
+                    return null;
                   },
                 ),
 
@@ -203,6 +220,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                     if(value!.trim().isEmpty){
                       return "Enter your mobile number";
                     }
+                    return null;
                   },
                 ),
 
@@ -221,6 +239,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                    if(password.isNotEmpty && password.length <6){
                      return "Password must be 6 digit";
                    }
+                   return null;
                   },
                 ),
 
@@ -247,8 +266,8 @@ class _UpdateProfileState extends State<UpdateProfile> {
     );
   }
   Future<void> pickupImage()async{
-    ImagePicker _imagePicker = ImagePicker();
-    XFile? image = await _imagePicker.pickImage(source: ImageSource.gallery);
+    ImagePicker imagePicker = ImagePicker();
+    XFile? image = await imagePicker.pickImage(source: ImageSource.gallery,imageQuality: 98);
     if(image != null){
       _pickedImage = image;
       setState(() {});

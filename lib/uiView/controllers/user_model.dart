@@ -4,7 +4,7 @@ class UserModel {
   final String firstName;
   final String lastName;
   final String mobilenumber;
-  final String photo;
+  String photo;
 
   String get fullname {
     return "$firstName $lastName";
@@ -37,6 +37,7 @@ class UserModel {
       "firstName": firstName,
       "lastName": lastName,
       "mobile": mobilenumber,
+      "photo": photo
     };
   }
 }
